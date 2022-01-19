@@ -6,6 +6,7 @@ on:
       # for this specific repo.
       images-to-keep:
         required: false
+        type: number
         default: 3
 
     secrets:
