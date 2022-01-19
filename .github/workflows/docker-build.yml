@@ -13,7 +13,6 @@ on:
       # that the service might need to install
       github-token:
         required: true
-        type: string
 
       # Project where the images will be pushed
       gcr-project-id:
