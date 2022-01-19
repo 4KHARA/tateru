@@ -1,0 +1,75 @@
+on:
+  workflow_call:
+    inputs:
+      # How many of the latest images
+      # to keep alive in the registry
+      # for this specific repo.
+      images-to-keep:
+        required: false
+        default: 3
+
+    secrets:
+      # The token to use for any dependencies
+      # that the service might need to install
+      github-token:
+        required: true
+        type: string
+
+      # Project where the images will be pushed
+      gcr-project-id:
+        required: true
+      
+      # The service account credentials for
+      # the GCR project.
+      gcr-credentials:
+        required: true
+
+jobs:
+  build-push:
+    runs-on: ubuntu-latest
+    
+    env:
+      AUTH_TOKEN: ${{ secrets.github-token }}
+      GCR_PROJECT_ID: ${{ secrets.gcr-project-id }}
+      KEEP: ${{ inputs.images-to-keep }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      # Login to gcp
+      - uses: google-github-actions/auth@v0
+        with:
+          credentials_json: ${{ secrets.gcr-credentials }}
+
+      # Configure docker credentials
+      - name: Configure docker credentials
+        run: gcloud auth configure-docker -q
+
+      # Build the docker image
+      - name: Build and push image
+        run: |
+          # Separate repo name from the author
+          export REPO_NAME=$( echo $GITHUB_REPOSITORY | awk -F '/' '{print $2}' )
+          export IMAGE_VERSION=$( echo $GITHUB_SHA | cut -c1-7 )
+
+          # Build the full image tag
+          export IMAGE_NAME="$REPO_NAME:$IMAGE_VERSION"
+
+          # Build the image
+          DOCKER_BUILDKIT=1 docker build . --file Dockerfile --build-arg GITHUB_TOKEN=$AUTH_TOKEN -t "eu.gcr.io/$GCR_PROJECT_ID/$IMAGE_NAME"
+
+          # Push the image
+          docker push eu.gcr.io/$GCR_PROJECT_ID/$IMAGE_NAME
+
+      # Cleanup
+      - name: Clean up old images
+        run: |
+          export repository=$( echo $GITHUB_REPOSITORY | awk -F '/' '{print $2}' )
+
+          export digests=$( gcloud container images list-tags eu.gcr.io/$GCR_PROJECT_ID/$repository --format='get(digest)' )
+          export to_delete=$( echo "$digests" | sed -e "1,${KEEP}d" )
+
+          for digest in $to_delete; do
+            gcloud container images delete eu.gcr.io/$GCR_PROJECT_ID/$repository@$digest --quiet --force-delete-tags
+          done
+
