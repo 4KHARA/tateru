@@ -16,6 +16,6 @@ jobs:
 
       - name: Run tests
         run: |
-          for path in $(echo $paths | tr "," "\n"); do
+          for path in $(echo $paths | tr "," "\n" | xargs -n 1); do
             go test -v "./$path"
           done
