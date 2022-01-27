@@ -1,0 +1,21 @@
+on:
+  workflow_call:
+    inputs:
+      paths:
+        required: true
+        type: string
+        default: "."
+        description: "A comma separated list of path names to run tests on."
+
+jobs:
+  test-code:
+    runs-on: ubuntu-latest
+
+  steps:
+    - uses: actions/checkout@v2
+
+    - name: Run tests
+      run: |
+        for path in $(echo $paths | tr "," "\n"); do
+          go test -v "./$path"
+        done
