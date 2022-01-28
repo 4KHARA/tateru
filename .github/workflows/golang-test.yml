@@ -10,7 +10,6 @@ on:
     secrets:
       github-login:
         required: true
-        type: string
         description: "The github login to use for the test."
 
 jobs:
