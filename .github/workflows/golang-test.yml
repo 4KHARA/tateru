@@ -24,7 +24,7 @@ jobs:
         run: |
           echo "https://${{ secrets.github-login }}@github.com" > ~/.git-credentials
           git config --global credential.helper store --file=~/.git-credentials
-          git config --global url.https://${{ secrets.github-login }}@github.com/.insteadOf https://github.com/
+          git config --global url."https://${{ secrets.github-login }}@github.com/".insteadOf "https://github.com/"
 
       - run: go get .
 
