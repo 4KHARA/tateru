@@ -20,18 +20,21 @@ jobs:
   test-code:
     runs-on: ubuntu-latest
 
+    env:
+      GOPRIVATE: "github.com/${{ secrets.go-private }}/*"
+
     steps:
       - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
 
       - name: Login with the specified credentials
         run: |
           echo "https://${{ secrets.github-login }}@github.com" > ~/.git-credentials
           git config --global credential.helper store --file=~/.git-credentials
+          git config --global url.https://${{ secrets.github-login }}@github.com.insteadOf https://github.com/
 
       - name: Run tests
         run: |
-          export GOPRIVATE="github.com/${{ secrets.go-private }}/*"
-
           for path in $(echo ${{ inputs.paths }} | tr "," "\n" | xargs -n 1); do
             go test -v "./$path"
           done
