@@ -1,12 +1,5 @@
 on:
   workflow_call:
-    inputs:
-      paths:
-        required: true
-        type: string
-        default: "."
-        description: "A comma separated list of path names to run tests on."
-
     secrets:
       github-login:
         required: true
