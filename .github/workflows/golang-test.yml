@@ -12,6 +12,10 @@ on:
         required: true
         description: "The github login to use for the test."
 
+      go-private:
+        required: true
+        description: "What private registry to use for installation."
+
 jobs:
   test-code:
     runs-on: ubuntu-latest
@@ -26,6 +30,8 @@ jobs:
 
       - name: Run tests
         run: |
+          export GOPRIVATE="github.com/${{ secrets.go-private }}/*"
+
           for path in $(echo ${{ inputs.paths }} | tr "," "\n" | xargs -n 1); do
             go test -v "./$path"
           done
