@@ -1,0 +1,26 @@
+on:
+  workflow_call:
+    secrets:
+      github-login:
+        required: true
+        description: "The github login to use for the test."
+
+
+jobs:
+  test-code:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+
+      - name: Login with the specified credentials
+        run: |
+          echo "https://${{ secrets.github-login }}@github.com" > ~/.git-credentials
+          git config --global credential.helper store --file=~/.git-credentials
+
+      - name: Install
+        run: npm install
+
+      - name: Run tests
+        run: npm test
