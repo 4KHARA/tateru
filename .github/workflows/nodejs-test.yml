@@ -1,9 +1,13 @@
 on:
   workflow_call:
     secrets:
-      github-login:
+      github-user:
         required: true
         description: "The github login to use for the test."
+
+      github-token:
+        required: true
+        description: "The github token to use for the test."
 
 
 jobs:
@@ -16,8 +20,10 @@ jobs:
 
       - name: Login with the specified credentials
         run: |
-          echo "https://${{ secrets.github-login }}@github.com" > ~/.git-credentials
+          echo "https://${{ secrets.github-user }}:${{ secrets.github-token }}@github.com" > ~/.git-credentials
           git config --global credential.helper store --file=~/.git-credentials
+
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.github-token }}" >> ~/.npmrc
 
       - name: Install
         run: npm install
