@@ -91,6 +91,7 @@ jobs:
 
       - name: Notify
         uses: appleboy/discord-action@master
+        continue-on-error: true
         with:
           webhook_id: ${{ secrets.webhook-id }}
           webhook_token: ${{ secrets.webhook-token }}
