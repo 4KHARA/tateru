@@ -92,8 +92,8 @@ jobs:
       - name: Notify
         uses: appleboy/discord-action@master
         with:
-          webhook-id: ${{ secrets.webhook-id }}
-          webhook-token: ${{ secrets.webhook-token }}
+          webhook_id: ${{ secrets.webhook-id }}
+          webhook_token: ${{ secrets.webhook-token }}
           username: ${{ env.REPO_NAME }}
           message: "ready for release: `${{ env.IMAGE_NAME }}`"
 
