@@ -9,6 +9,13 @@ on:
         type: number
         default: 3
 
+      # Notification avatar url to send with the
+      # webhook.
+      avatar-url:
+        required: false
+        type: string
+        default: "https://i.imgur.com/KmBZ55C.jpg"
+
     secrets:
       # The token to use for any dependencies
       # that the service might need to install
@@ -97,4 +104,5 @@ jobs:
           webhook_token: ${{ secrets.webhook-token }}
           username: ${{ env.REPO_NAME }}
           message: "ready for release: `${{ env.IMAGE_NAME }}`"
+          avatar_url: ${{ inputs.avatar-url }}
 
